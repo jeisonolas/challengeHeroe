@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.in2.technical.challenge.api.domains.SuperHeroe;
 import com.in2.technical.challenge.api.domains.dtos.SuperHeroeRequest;
+import com.in2.technical.challenge.api.exceptions.ApiBussinessException;
 import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -23,7 +24,7 @@ import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
 	private ISuperHeroeService service;
 	
 	@Test
-	void getHeroesTest() {
+	void getHeroesTest() throws ApiBussinessException {
 		
 		List<SuperHeroe> heroes = service.getHeroes();
 		assertNotNull(heroes);
@@ -31,7 +32,7 @@ import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
 	}
 	
 	@Test
-	void getHeroesByNameTest() {
+	void getHeroesByNameTest() throws ApiBussinessException {
 		
 		List<SuperHeroe> heroes = service.getHeroesByName("man");
 		assertNotNull(heroes);
@@ -39,7 +40,7 @@ import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
 	}
 	
 	@Test
-	void getHeroesByIdTest() {
+	void getHeroesByIdTest() throws ApiBussinessException {
 		
 		SuperHeroe heroe = service.getHeroeById(1L);
 		assertNotNull(heroe);
@@ -61,8 +62,8 @@ import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
     }
 	
 	@Test
-	void deleteHeroeTest() {
+	void deleteHeroeTest() throws ApiBussinessException {
 		
-		assertTrue(service.deleteHeroe(3L));
+		assertEquals("Heroe was eliminated",service.deleteHeroe(3L));
 	}
 }

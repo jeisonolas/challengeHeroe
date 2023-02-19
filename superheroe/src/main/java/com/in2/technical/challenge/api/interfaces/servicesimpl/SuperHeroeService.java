@@ -6,8 +6,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.in2.technical.challenge.api.commons.Validations;
 import com.in2.technical.challenge.api.domains.SuperHeroe;
 import com.in2.technical.challenge.api.domains.dtos.SuperHeroeRequest;
+import com.in2.technical.challenge.api.exceptions.ApiBussinessException;
 import com.in2.technical.challenge.api.interfaces.services.ISuperHeroeService;
 import com.in2.technical.challenge.api.mappers.SuperHeroeMapper;
 import com.in2.technical.challenge.api.repositories.ISuperHeroeRepository;
@@ -19,22 +21,33 @@ public class SuperHeroeService implements ISuperHeroeService {
 	ISuperHeroeRepository repository;
 
 	@Override
-	public List<SuperHeroe> getHeroes() {
+	public List<SuperHeroe> getHeroes() throws ApiBussinessException {
 		
-		return  repository.findAll();
+		List<SuperHeroe> heroes = repository.findAll();
+		
+		Validations.validationList(heroes);
+	
+		return heroes ;
 	}
 
 	@Override
-	public List<SuperHeroe> getHeroesByName(String name) {
-		return  repository.findByNameContaining(name);
+	public List<SuperHeroe> getHeroesByName(String name) throws ApiBussinessException {
+		
+		List<SuperHeroe> heroes = repository.findByNameContaining(name);
+		
+		Validations.validationList(heroes);
+		
+		return heroes;  
 	}
 	
 	@Override
-	public SuperHeroe getHeroeById(Long id) {
+	public SuperHeroe getHeroeById(Long id) throws ApiBussinessException {
 		
 		Optional<SuperHeroe> heroe = repository.findById(id);
 		
-		return heroe.isPresent() ? heroe.get() : null;
+		Validations.validationObject(heroe);
+		
+		return heroe.get();
 	}
 	
 	@Override
@@ -46,31 +59,26 @@ public class SuperHeroeService implements ISuperHeroeService {
 	}
 
 	@Override
-	public SuperHeroe updateHeroe(Long id, SuperHeroeRequest request) {
+	public SuperHeroe updateHeroe(Long id, SuperHeroeRequest request) throws ApiBussinessException {
 		
-		Optional<SuperHeroe> superHeroeDB = repository.findById(id);
+		SuperHeroe superHeroeDB = this.getHeroeById(id);
 		SuperHeroe updatedHeroe = SuperHeroeMapper.INSTANCE.superHeroeRequestToSuperHeroe(request);
-		
-		if(superHeroeDB.isPresent()) {
-			 	SuperHeroe heroe  = superHeroeDB.get();
+			            
+		superHeroeDB.setAlterEgo(updatedHeroe.getAlterEgo());
+		superHeroeDB.setName(updatedHeroe.getName());
+		superHeroeDB.setFirstAppearance(updatedHeroe.getFirstAppearance());
+		superHeroeDB.setPublisher(updatedHeroe.getPublisher());
 	            
-	            heroe.setAlterEgo(updatedHeroe.getAlterEgo());
-	            heroe.setName(updatedHeroe.getName());
-	            heroe.setFirstAppearance(updatedHeroe.getFirstAppearance());
-	            heroe.setPublisher(updatedHeroe.getPublisher());
-	            
-	            repository.save(heroe);
-	            
-	            return heroe;
-		}
-		
-		
-		return null;
+		return repository.save(superHeroeDB);
 	}
 
 	@Override
-	public boolean deleteHeroe(Long id) {
-		repository.deleteById(id);
-		return true;
+	public String deleteHeroe(Long id) throws ApiBussinessException {
+		
+		SuperHeroe superHeroe= this.getHeroeById(id);
+		
+		repository.delete(superHeroe);
+		
+		return "Heroe was eliminated";
 	}
 }

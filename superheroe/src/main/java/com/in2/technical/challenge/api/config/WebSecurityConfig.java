@@ -12,6 +12,7 @@ public class WebSecurityConfig {
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
 		return http
+				.csrf().disable()
 				.authorizeRequests()
 				.antMatchers(	"/v3/api-docs/**",
 				        		"/swagger-ui/**",
